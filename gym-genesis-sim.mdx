@@ -163,6 +163,60 @@ def expert_policy_v2(robot, obs, stage) -> list[torch.Tensor]:
 * **Hurts (early on):** Aggressive clutter + harsh speculars before policy stabilizes; overly tight lateral offsets; tiny waypoint counts near joint limits
 
 ---
+Perfect 👍 — then your **Getting Started** can end with a pointer to that script, so readers see the *“full pipeline”* after the toy example. Here’s how I’d phrase it in the README/blog:
+
+---
+
+## Getting Started with Gym-Genesis
+
+Install and set up:
+
+```bash
+git clone https://github.com/huggingface/gym-genesis.git
+cd gym-genesis
+pip install -e .  # or pip install -e .[lerobot]
+```
+
+Run a simple rollout (10 parallel CubePick envs):
+
+```python
+import gymnasium as gym
+import gym_genesis
+import numpy as np
+import imageio
+
+env = gym.make("gym_genesis/CubePick-v0", enable_pixels=True, num_envs=10)
+obs, info = env.reset()
+frames = []
+
+for _ in range(1000):
+    actions = np.stack([env.action_space.sample() for _ in range(env.num_envs)])
+    obs, reward, terminated, truncated, info = env.step(actions)
+    frames.append(env.render())
+
+    if np.any(terminated) or np.any(truncated):
+        obs, info = env.reset()
+
+imageio.mimsave("example.mp4", np.stack(frames), fps=25)
+```
+
+This runs **10 environments in parallel on GPU** and saves a short video of the rollout.
+
+---
+
+### Full data collection example
+
+To actually generate **batched cube stacking data** with the IK expert policy and save it in `LeRobotDataset` format, run:
+
+```bash
+python examples/so_101/collect_task_stack_cube_batch.py
+```
+
+This will spin up vectorized SO-101 envs, roll out the expert, and record thousands of episodes with domain randomization (cameras, lighting, cube color/position, robot placement).
+
+---
+
+**Note:** Gym-Genesis is a **research repo**. The focus is on speed and experimentation, not on polished APIs. Expect working code that’s fast and flexible, but not production-grade.
 
 ## Scope
 
