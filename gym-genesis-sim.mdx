@@ -1,4 +1,4 @@
-# Generating Unlimited Robot Interaction Data with Gym-Genesis
+# Generating Unlimited Robot Simulation Data with Gym-Genesis
 
 TL;DR: Robots don't get trillions of web tokens for free. A robot's "tokens" are joint angles, contacts, camera streams, and physics, so we generate them. We build a lightweight, [Gym-Genesis](https://github.com/huggingface/gym-genesis) pipeline to synthesize large, diverse robot episodes for pretraining vision-language-action (VLA) models like **SmolVLA**. The recipe is simple: [Inverse Kinematics](https://en.wikipedia.org/wiki/Inverse_kinematics) expert controllers inside a fast, vectorized [simulator](https://en.wikipedia.org/wiki/Robotics_simulator), broad domain randomization, and outputs that plug straight into imitation learning (IL) and reinforcement learning (RL) evaluation. Crucially, this setup can generate **virtually unlimited robot interaction data** at a fraction of the cost of collecting it in the real world.
 
