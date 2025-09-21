@@ -30,6 +30,7 @@ Wrist camera: mounted on the gripper, it delivers an egocentric view critical fo
 <p align="center">
   <img src="https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/lerobot-sim/three-cams.png" alt="Stage-conditioned Cartesian targets" width="70%">
 </p>
+
 ## Visualization & Rendering
 
 We used Genesis in two modes: a rasterizer and a ray tracer.
@@ -148,7 +149,10 @@ def expert_policy_v2(robot, obs, stage) -> list[torch.Tensor]:
 * **Geometry compensation:** stage offsets $(z_{\text{off}}, \Delta_{xy}, \delta_z)$ account for gripper thickness and cube size.
 * **Throughput:** all math is batched; Genesis keeps the sim vectorized and stable.
 
-*Asset tip:* Right under this section, add (i) a tiny parameter box with the constants and (ii) a short GIF showing the 7 stages overlaid with the waypoint path.
+<p align="center">
+  <img src="https://huggingface.co/datasets/jadechoghari/lerobot-libero-assets/resolve/main/expert_policy_pipeline.png" alt="Expert policy pipeline" width="40%">
+</p>
+
 
 ## What helps vs. what doesn't (quick notes)
 
