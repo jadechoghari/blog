@@ -2,6 +2,10 @@
 
 **TL;DR.** Robots don't get trillions of web tokens for free. A robot's "tokens" are joint angles, contacts, camera streams, and physics—so we generate them. We build a lightweight, **Gym-Genesis** pipeline to synthesize large, diverse robot episodes for pretraining vision-language-action (VLA) models like **SmolVLA**. The recipe is simple: **IK expert controllers** inside a **fast, vectorized simulator**, broad **domain randomization**, and outputs that plug straight into imitation learning (IL) and reinforcement learning (RL) evaluation.
 
+<video alt="demo_real.mp4" autoplay loop muted playsinline controls width="600">
+  <source src="https://huggingface.co/datasets/jadechoghari/lerobot-libero-assets/resolve/main/demo_real.mp4" type="video/mp4">
+</video>
+
 
 ## Why synthetic data?
 
@@ -17,6 +21,23 @@ A **GPU-vectorized data factory** using **Gym-Genesis** to produce high-quality 
 
 > **Why Genesis?** It's fast, vectorized, and easy to batch. That translates to **throughput** (scale), **stability** (fewer sim stalls), and **repeatability** (clean seeds)—exactly what you want in a data factory.
 
+## Cameras
+To maximize visual coverage, we used three cameras placed in complementary positions:
+Top camera: provides a global bird’s-eye view of the workspace, so the policy always has access to object locations and overall scene layout.
+Side camera: captures depth cues, occlusions, and contact events that are invisible from the top.
+Wrist camera: mounted on the gripper, it delivers an egocentric view critical for fine alignment during grasping and stacking.
+
+<p align="center">
+  <img src="https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/lerobot-sim/three-cams.png" alt="Stage-conditioned Cartesian targets" width="70%">
+</p>
+## Visualization & Rendering
+
+We used Genesis in two modes: a rasterizer and a ray tracer.
+Rasterization projects geometry onto the image plane in a single pass. It’s extremely fast and ideal for generating large datasets—this is what we used for the bulk of our pretraining episodes.
+Ray tracing (via LuisaRender) simulates light transport by tracing rays as they bounce across surfaces. This produces softer shadows, reflections, and more realistic lighting effects. The cost is speed, but the gain is images that look much closer to real camera captures.
+<p align="center">
+  <img src="https://huggingface.co/datasets/jadechoghari/lerobot-libero-assets/resolve/main/normal-real-cam.png" alt="Ray tracing vs Rasterizer" width="70%">
+</p>
 
 ## The Expert Policy (v2): from Cartesian Waypoints → IK → Joint Interpolation
 
@@ -128,21 +149,6 @@ def expert_policy_v2(robot, obs, stage) -> list[torch.Tensor]:
 * **Throughput:** all math is batched; Genesis keeps the sim vectorized and stable.
 
 *Asset tip:* Right under this section, add (i) a tiny parameter box with the constants and (ii) a short GIF showing the 7 stages overlaid with the waypoint path.
-
----
-
-## Cameras & rendering (diversity without breaking observability)
-
-We use a pinhole model with randomized intrinsics/extrinsics and small **piston jitter** (axial motion). We add mild sensor noise.
-
-Rendering modes:
-* **Rasterization** for maximum throughput (default for scale)
-* **Ray tracing** when we want speculars/soft shadows to expose brittleness
-* **Luisa** when we need programmable BRDFs/special effects
-
-Start modestly (textures, lights, poses), **stabilize grasp success**, then ramp up diversity. Over-randomizing too early hurts success rates.
-
----
 
 ## What helps vs. what doesn't (quick notes)
 
