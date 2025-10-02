@@ -6700,3 +6700,14 @@
     - enterprise
     - partnerships
     - hub
+
+- local: lerobot-gym-genesis-sim
+  title: "`LeRobotDataset`: Bringing large-scale datasets to lerobot"
+  author: jadechoghari
+  thumbnail: /blog/assets/lerobot-gym-genesis-sim/thumbnail.png
+  date: Oct 2, 2025
+  tags:
+    - lerobot
+    - datasets
+    - robotics
+    - simulation
